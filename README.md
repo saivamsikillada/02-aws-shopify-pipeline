@@ -175,7 +175,7 @@ End
 
 ## 👩‍💻 Author
 
-**Ashwini**
+Vamsi
 
 End-to-End AWS Data Engineering Project using Apache Airflow, AWS Glue, Amazon S3, Amazon Athena, Docker, Git, and GitLab CI.
 
