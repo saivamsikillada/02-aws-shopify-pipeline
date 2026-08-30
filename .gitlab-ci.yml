@@ -1,0 +1,42 @@
+image: python:3.11
+
+stages:
+  - validate
+  - test
+
+cache:
+  paths:
+    - .pip-cache/
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.pip-cache"
+
+before_script:
+  - python --version
+  - pip install --upgrade pip
+  - pip install -r requirements.txt
+
+validate:
+  stage: validate
+  script:
+    - python -m compileall .
+  only:
+    - merge_requests
+    - develop
+    - main
+    - feature/*
+
+unit_tests:
+  stage: test
+  script:
+    - pytest tests/ -v
+  artifacts:
+    when: always
+    expire_in: 7 days
+    paths:
+      - .pytest_cache/
+  only:
+    - merge_requests
+    - develop
+    - main
+    - feature/*
