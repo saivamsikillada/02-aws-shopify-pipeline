@@ -2,38 +2,45 @@
 
 ## 📌 Project Overview
 
-This project demonstrates an end-to-end AWS Data Engineering Pipeline built using the Medallion Architecture (Bronze, Silver, and Gold). The pipeline extracts data from multiple enterprise source systems, processes and transforms it using AWS Glue ETL jobs, stores data in Amazon S3, registers metadata in the AWS Glue Data Catalog, and enables analytics through Amazon Athena. Apache Airflow is used to orchestrate the complete workflow, while GitLab and GitLab CI provide version control and automated code validation.
+This project demonstrates an end-to-end AWS Data Engineering Pipeline built using the Medallion Architecture (Bronze, Silver, and Gold).
+
+The pipeline extracts data from multiple enterprise source systems, stores raw data in Amazon S3, processes and transforms the data using AWS Glue ETL jobs, stores transformed datasets in S3, registers metadata using the AWS Glue Data Catalog, and enables analytics using Amazon Athena.
+
+Apache Airflow is used to orchestrate the complete workflow, while GitHub and GitHub Actions are used for version control and automated code validation.
 
 ---
 
 ## 🏗️ Architecture
 
-```
-                GitLab Repository
-                       │
-                GitLab CI Pipeline
-                       │
-                       ▼
-                Apache Airflow
-             (Workflow Orchestration)
-                       │
-                       ▼
-                AWS Glue ETL Jobs
-                       │
-        ┌──────────────┼──────────────┐
-        ▼              ▼              ▼
-   Bronze S3      Silver S3      Gold S3
-                       │
-                       ▼
-             AWS Glue Data Catalog
-                       │
-                       ▼
-                Amazon Athena
+```text
+                    GitHub Repository
+                           │
+                    GitHub Actions
+                           │
+                           ▼
+                    Apache Airflow
+                 (Workflow Orchestration)
+                           │
+                           ▼
+                    AWS Glue ETL Jobs
+                           │
+             ┌─────────────┼─────────────┐
+             ▼             ▼             ▼
+        Bronze S3     Silver S3       Gold S3
+             │             │             │
+             └─────────────┼─────────────┘
+                           ▼
+                AWS Glue Data Catalog
+                           │
+                           ▼
+                    Amazon Athena
 ```
 
 ---
 
 ## 📂 Source Systems
+
+The pipeline is designed to process data from multiple enterprise source systems:
 
 - MySQL
 - Salesforce
@@ -54,8 +61,8 @@ This project demonstrates an end-to-end AWS Data Engineering Pipeline built usin
 - Apache Airflow
 - Docker
 - Git
-- GitLab
-- GitLab CI
+- GitHub
+- GitHub Actions
 
 ---
 
@@ -63,43 +70,117 @@ This project demonstrates an end-to-end AWS Data Engineering Pipeline built usin
 
 ```text
 02-aws-shopify-pipeline/
+│
 ├── airflow/
+│   ├── config/
+│   ├── dags/
+│   ├── plugins/
+│   ├── requirements.txt
+│   └── README.md
+│
 ├── config/
+│   ├── aws_config.py
+│   └── config.py
+│
 ├── docs/
+│   ├── architecture.md
+│   ├── deployment_guide.md
+│   ├── project_workflow.md
+│   ├── troubleshooting.md
+│   └── ppt/
+│
 ├── glue_jobs/
+│   ├── common/
+│   │   ├── constants.py
+│   │   ├── glue_context.py
+│   │   ├── logger.py
+│   │   ├── quality.py
+│   │   └── writer.py
+│   │
+│   ├── silver/
+│   │   ├── customer_etl.py
+│   │   ├── product_etl.py
+│   │   ├── orders_etl.py
+│   │   ├── payments_etl.py
+│   │   └── inventory_etl.py
+│   │
+│   ├── gold/
+│   │   ├── dim_customer.py
+│   │   ├── dim_product.py
+│   │   ├── fact_orders.py
+│   │   ├── fact_payments.py
+│   │   └── inventory_summary.py
+│   │
+│   ├── logs/
+│   └── requirements.txt
+│
 ├── queries/
 ├── scripts/
 ├── tests/
 ├── utils/
 ├── views/
-├── .env
 ├── .gitignore
-├── .gitlab-ci.yml
 ├── Dockerfile
 ├── docker-compose.yml
 ├── requirements.txt
 ├── s3_setup.md
 └── README.md
+```
+
+> `.env` is intentionally excluded from version control because it may contain sensitive configuration or credentials.
 
 ---
 
 ## ⚙️ Project Workflow
 
-1. Extract data from multiple enterprise source systems.
-2. Store raw data in the Bronze layer of Amazon S3.
-3. Process and clean data using AWS Glue ETL jobs.
-4. Store transformed datasets in the Silver layer.
-5. Create business-ready datasets in the Gold layer.
-6. Register tables in the AWS Glue Data Catalog.
-7. Query processed data using Amazon Athena.
-8. Orchestrate the complete ETL workflow using Apache Airflow.
-9. Validate code changes automatically using GitLab CI.
+```text
+Source Systems
+      │
+      ▼
+Amazon S3 - Bronze / RAW
+      │
+      ▼
+AWS Glue Crawler
+      │
+      ▼
+AWS Glue Data Catalog
+      │
+      ▼
+AWS Glue Silver ETL
+      │
+      ├── Customer
+      ├── Product
+      ├── Orders
+      ├── Payments
+      └── Inventory
+      │
+      ▼
+Amazon S3 - Silver / PROCESSED
+      │
+      ▼
+AWS Glue Gold ETL
+      │
+      ├── Dimension Customer
+      ├── Dimension Product
+      ├── Fact Orders
+      ├── Fact Payments
+      └── Inventory Summary
+      │
+      ▼
+Amazon S3 - Gold
+      │
+      ▼
+AWS Glue Data Catalog
+      │
+      ▼
+Amazon Athena
+```
 
 ---
 
 ## 🔄 Airflow Orchestration Flow
 
-```
+```text
 Start
    │
    ▼
@@ -138,19 +219,247 @@ End
 
 ---
 
-## ✅ Project Features
+## 🔄 GitHub Development Workflow
 
-- End-to-End AWS Data Engineering Pipeline
-- Medallion Architecture (Bronze → Silver → Gold)
-- Automated ETL using AWS Glue
-- Workflow Orchestration using Apache Airflow
-- Metadata Management using AWS Glue Data Catalog
-- SQL Analytics using Amazon Athena
-- Dockerized Airflow Environment
-- Version Control using Git & GitLab
-- Automated Validation using GitLab CI Pipeline
+```text
+Developer
+    │
+    ▼
+Local Project
+    │
+    ▼
+Git
+    │
+    ▼
+GitHub Repository
+    │
+    ▼
+GitHub Actions
+    │
+    ├── Code Validation
+    ├── Import Tests
+    └── Glue/Airflow Tests
+    │
+    ▼
+Deployment / Execution
+```
 
+---
 
+## 🥉 Bronze Layer
+
+The Bronze layer contains the raw source data.
+
+Example:
+
+```text
+S3
+└── RAW/
+    ├── mysql/
+    ├── pos/
+    ├── salesforce/
+    ├── saphana/
+    └── teradata/
+```
+
+The data is stored in its original/raw form with minimal transformation.
+
+---
+
+## 🥈 Silver Layer
+
+The Silver layer contains cleaned and standardized data.
+
+Typical transformations include:
+
+- Schema mapping
+- Data type conversion
+- Duplicate removal
+- Trimming whitespace
+- Standardizing values
+- Null handling
+- Email validation
+- Date standardization
+- Data quality checks
+
+Example:
+
+```text
+S3
+└── PROCESSED/
+    ├── customers/
+    ├── products/
+    ├── orders/
+    ├── payments/
+    └── inventory/
+```
+
+---
+
+## 🥇 Gold Layer
+
+The Gold layer contains business-ready datasets designed for analytics.
+
+Example:
+
+```text
+S3
+└── GOLD/
+    ├── dim_customer/
+    ├── dim_product/
+    ├── fact_orders/
+    ├── fact_payments/
+    └── inventory_summary/
+```
+
+---
+
+## 🔍 AWS Glue Data Catalog
+
+AWS Glue Crawler is used to discover schemas from data stored in Amazon S3.
+
+The crawler creates and updates metadata in the AWS Glue Data Catalog.
+
+Example:
+
+```text
+S3
+   │
+   ▼
+Glue Crawler
+   │
+   ▼
+Glue Data Catalog
+   │
+   ├── Database: shopify_db
+   └── Tables
+        ├── mysql
+        ├── pos
+        ├── salesforce
+        ├── saphana
+        └── teradata
+```
+
+Glue ETL jobs can then read data through the Data Catalog.
+
+---
+
+## 🧹 Data Quality
+
+The pipeline includes data quality validation as part of the Silver transformation process.
+
+Examples include:
+
+- Duplicate detection
+- Null checks
+- Email validation
+- Schema validation
+- Data type validation
+- Date validation
+
+Invalid records can be identified before the data reaches downstream analytical layers.
+
+---
+
+## 🛡️ Data Deduplication
+
+Customer records are deduplicated using the business key:
+
+```text
+customer_id
+```
+
+Example:
+
+```python
+df.dropDuplicates(["customer_id"])
+```
+
+For scenarios where the latest record must be retained, window functions can be used based on an appropriate timestamp.
+
+---
+
+## 📊 Analytics
+
+Amazon Athena is used to query the processed datasets using SQL.
+
+Example analytical areas:
+
+- Customer analysis
+- Product analysis
+- Sales analysis
+- Payment analysis
+- Inventory analysis
+
+---
+
+## 🤖 Automation and Orchestration
+
+Apache Airflow orchestrates the complete data pipeline.
+
+Airflow is responsible for:
+
+- Triggering ETL jobs
+- Managing task dependencies
+- Handling retries
+- Monitoring pipeline execution
+- Scheduling workflows
+
+---
+
+## 🔐 Security
+
+AWS IAM is used to control access to:
+
+- Amazon S3
+- AWS Glue
+- AWS Glue Data Catalog
+- Amazon Athena
+
+Sensitive credentials are not committed to GitHub.
+
+The `.env` file is excluded using `.gitignore`.
+
+---
+
+## 🧪 Testing
+
+The project includes automated tests for:
+
+- Airflow DAG validation
+- Glue job validation
+- Python imports
+- Project configuration
+
+Tests are maintained under:
+
+```text
+tests/
+```
+
+---
+
+## 🚀 CI/CD
+
+GitHub Actions is used for automated code validation.
+
+The workflow is:
+
+```text
+Code Change
+    │
+    ▼
+GitHub
+    │
+    ▼
+GitHub Actions
+    │
+    ├── Run Tests
+    ├── Validate Code
+    └── Check Imports
+```
+
+---
 
 ## 📊 AWS Services Used
 
@@ -164,19 +473,25 @@ End
 
 ## 🎯 Project Outcome
 
-- Built a scalable cloud-native Data Engineering pipeline.
-- Successfully orchestrated AWS Glue ETL jobs using Apache Airflow.
-- Processed enterprise data from multiple source systems.
-- Implemented GitLab CI for automated project validation.
-- Enabled SQL-based analytics using Amazon Athena.
-- Designed a modular and production-style ETL workflow following the Medallion Architecture.
+The project demonstrates a production-style cloud data engineering pipeline using AWS services.
+
+Key outcomes include:
+
+- Built an end-to-end AWS Data Engineering pipeline.
+- Implemented Bronze, Silver and Gold data layers.
+- Used Amazon S3 as the cloud data lake.
+- Implemented AWS Glue ETL transformations.
+- Implemented AWS Glue Data Catalog for metadata management.
+- Implemented data quality and deduplication.
+- Created business-ready Gold datasets.
+- Enabled SQL analytics using Amazon Athena.
+- Orchestrated workflows using Apache Airflow.
+- Implemented Git-based version control using GitHub.
+- Implemented automated validation using GitHub Actions.
+- Designed a modular and scalable ETL architecture.
 
 ---
 
-## 👩‍💻 Author
+## 👨‍💻 Author
 
-Vamsi
-
-End-to-End AWS Data Engineering Project using Apache Airflow, AWS Glue, Amazon S3, Amazon Athena, Docker, Git, and GitLab CI.
-
-
+**Vamsi**
